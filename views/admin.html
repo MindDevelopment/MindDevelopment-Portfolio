@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Portfolio</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo-text">Daan.dev</a>
+            <div class="nav-actions">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    Back to Portfolio
+                </a>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="admin-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Welcome to <span class="highlight">Admin Panel</span>
+            </h1>
+            <p class="hero-subtitle">
+                Manage your portfolio projects and content
+            </p>
+        </div>
+        <div class="hero-visual">
+            <div class="floating-elements">
+                <div class="element element-1">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="element element-2">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="element element-3">
+                    <i class="fas fa-edit"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        <div class="container">
+            <div class="admin-section">
+                <div class="section-header">
+                    <h2>Project Management</h2>
+                    <button class="btn btn-primary" onclick="showAddForm()">
+                        <i class="fas fa-plus"></i>
+                        Add New Project
+                    </button>
+                </div>
+
+                <!-- Add Project Form -->
+                <div class="add-form" id="add-form" style="display: none;">
+                    <h3 id="form-title">Create New Project</h3>
+                    <form id="project-form" enctype="multipart/form-data">
+                        <input type="hidden" id="project-id" name="projectId">
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="title">Project Title:</label>
+                                <input type="text" id="title" name="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="technologies">Technologies (comma separated):</label>
+                                <input type="text" id="technologies" name="technologies" required placeholder="React, Node.js, MongoDB">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <textarea id="description" name="description" required placeholder="Describe your project..."></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="image">Project Image:</label>
+                                <input type="file" id="image" name="image" accept="image/*">
+                                <div id="current-image" style="display: none; margin-top: 10px;">
+                                    <small>Current image: <span id="current-image-name"></span></small>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" name="featured" id="featured">
+                                    <span class="checkmark"></span>
+                                    Featured Project
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="has-github" onchange="toggleGithubField()">
+                                    <span class="checkmark"></span>
+                                    Has GitHub Repository
+                                </label>
+                                <input type="url" id="githubUrl" name="githubUrl" placeholder="https://github.com/username/repo" style="display: none; margin-top: 10px;">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="has-live" onchange="toggleLiveField()">
+                                    <span class="checkmark"></span>
+                                    Has Live Demo
+                                </label>
+                                <input type="url" id="liveUrl" name="liveUrl" placeholder="https://example.com" style="display: none; margin-top: 10px;">
+                            </div>
+                        </div>
+                        
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">
+                                <i class="fas fa-save"></i>
+                                Save Project
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="hideAddForm()">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Projects List -->
+                <div class="projects-list" id="projects-list">
+                    <!-- Projects will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/admin.js"></script>
+</body>
+</html>
