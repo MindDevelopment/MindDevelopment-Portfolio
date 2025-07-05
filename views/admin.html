@@ -87,10 +87,16 @@
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="image">Project Image:</label>
-                                <input type="file" id="image" name="image" accept="image/*">
-                                <div id="current-image" style="display: none; margin-top: 10px;">
-                                    <small>Current image: <span id="current-image-name"></span></small>
+                                <label for="image">Project Banner:</label>
+                                <input type="file" id="image" name="image" accept="image/*" onchange="previewBanner(this)">
+                                <div id="current-banner" style="display: none; margin-top: 10px;">
+                                    <small>Current banner: <span id="current-banner-name"></span></small>
+                                </div>
+                                <div id="banner-preview-container" style="margin-top: 15px; display: none;">
+                                    <img id="banner-preview" style="max-width: 200px; max-height: 100px; border-radius: 8px; border: 1px solid #64748b; object-fit: cover;">
+                                    <button type="button" onclick="removeBannerPreview()" style="display: block; margin-top: 8px; background: #dc2626; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                        <i class="fas fa-times"></i> Remove Banner
+                                    </button>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -99,6 +105,19 @@
                                     <span class="checkmark"></span>
                                     Featured Project
                                 </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="preview-images">Preview Images (multiple selection):</label>
+                            <input type="file" id="preview-images" name="previewImages" accept="image/*" multiple onchange="previewMultipleImages(this)">
+                            <div id="preview-images-container" style="margin-top: 15px; display: none;">
+                                <div class="preview-grid" id="preview-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                                    <!-- Preview images will be shown here -->
+                                </div>
+                                <button type="button" onclick="removeAllPreviews()" style="background: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                                    <i class="fas fa-trash"></i> Remove All Previews
+                                </button>
                             </div>
                         </div>
                         

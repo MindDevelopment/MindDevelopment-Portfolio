@@ -17,9 +17,14 @@ function initNavigation() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     
-    // Smooth scrolling for navigation links
+    // Smooth scrolling for navigation links (except admin link)
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
+            // Don't prevent default for external links (like admin)
+            if (this.getAttribute('href').startsWith('/')) {
+                return; // Let the browser handle the navigation
+            }
+            
             e.preventDefault();
             const targetId = this.getAttribute('href').substring(1);
             const targetElement = document.getElementById(targetId);
@@ -156,6 +161,23 @@ function createProjectCard(project) {
         `);
     }
     
+    // Create preview images gallery if available
+    let previewGallery = '';
+    if (project.previewImages && project.previewImages.length > 0) {
+        const previewImagesHtml = project.previewImages.map(img => 
+            `<img src="${img}" alt="Preview" class="preview-image" onclick="openImageModal('${img}')">`
+        ).join('');
+        
+        previewGallery = `
+            <div class="preview-gallery">
+                <h4>Preview Images</h4>
+                <div class="preview-images-grid">
+                    ${previewImagesHtml}
+                </div>
+            </div>
+        `;
+    }
+    
     card.innerHTML = `
         ${project.imageUrl ? `
             <img src="${project.imageUrl}" alt="${project.title}" class="project-image" loading="lazy">
@@ -165,12 +187,52 @@ function createProjectCard(project) {
             </div>
         `}
         <div class="project-content">
+            ${project.featured ? '<div class="featured-badge"><i class="fas fa-star"></i> Featured</div>' : ''}
             <h3 class="project-title">${project.title}</h3>
             <p class="project-description">${formattedDescription}</p>
             <div class="project-tech">${techTags}</div>
+            ${previewGallery}
             ${links.length > 0 ? `<div class="project-links">${links.join('')}</div>` : ''}
         </div>
     `;
     
     return card;
 }
+
+// Function to open image modal
+function openImageModal(imageSrc) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('image-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'image-modal';
+        modal.className = 'image-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="modal-close" onclick="closeImageModal()">&times;</span>
+                <img id="modal-image" src="" alt="Preview">
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Set image and show modal
+    document.getElementById('modal-image').src = imageSrc;
+    modal.style.display = 'flex';
+}
+
+// Function to close image modal
+function closeImageModal() {
+    const modal = document.getElementById('image-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('image-modal');
+    if (modal && e.target === modal) {
+        closeImageModal();
+    }
+});

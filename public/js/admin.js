@@ -9,14 +9,131 @@ document.addEventListener('DOMContentLoaded', function() {
 
 let editingProjectId = null;
 
+function previewImage(input) {
+    const previewContainer = document.getElementById('image-preview-container');
+    const previewImg = document.getElementById('image-preview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewContainer.style.display = 'block';
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+
+function removeImagePreview() {
+    const input = document.getElementById('image');
+    const previewContainer = document.getElementById('image-preview-container');
+    const previewImg = document.getElementById('image-preview');
+    
+    input.value = '';
+    previewImg.src = '';
+    previewContainer.style.display = 'none';
+}
+
+function previewBanner(input) {
+    const previewContainer = document.getElementById('banner-preview-container');
+    const previewImg = document.getElementById('banner-preview');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewContainer.style.display = 'block';
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+
+function removeBannerPreview() {
+    const input = document.getElementById('image');
+    const previewContainer = document.getElementById('banner-preview-container');
+    const previewImg = document.getElementById('banner-preview');
+    
+    input.value = '';
+    previewImg.src = '';
+    previewContainer.style.display = 'none';
+}
+
+function previewMultipleImages(input) {
+    const previewContainer = document.getElementById('preview-images-container');
+    const previewGrid = document.getElementById('preview-grid');
+    
+    if (input.files && input.files.length > 0) {
+        previewGrid.innerHTML = '';
+        
+        Array.from(input.files).forEach((file, index) => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.style.cssText = 'position: relative; border: 1px solid #64748b; border-radius: 8px; overflow: hidden;';
+                    
+                    imgContainer.innerHTML = `
+                        <img src="${e.target.result}" style="width: 100%; height: 100px; object-fit: cover; display: block;">
+                        <button type="button" onclick="removePreviewImage(${index})" style="position: absolute; top: 5px; right: 5px; background: rgba(220, 38, 38, 0.8); color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    previewGrid.appendChild(imgContainer);
+                };
+                
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        previewContainer.style.display = 'block';
+    } else {
+        previewContainer.style.display = 'none';
+    }
+}
+
+function removePreviewImage(index) {
+    const input = document.getElementById('preview-images');
+    const dt = new DataTransfer();
+    
+    Array.from(input.files).forEach((file, i) => {
+        if (i !== index) {
+            dt.items.add(file);
+        }
+    });
+    
+    input.files = dt.files;
+    previewMultipleImages(input);
+}
+
+function removeAllPreviews() {
+    const input = document.getElementById('preview-images');
+    const previewContainer = document.getElementById('preview-images-container');
+    
+    input.value = '';
+    previewContainer.style.display = 'none';
+}
+
 function showAddForm() {
     document.getElementById('add-form').style.display = 'block';
     document.getElementById('form-title').textContent = 'Create New Project';
     document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Save Project';
     document.getElementById('project-form').reset();
     document.getElementById('project-id').value = '';
-    document.getElementById('current-image').style.display = 'none';
+    document.getElementById('current-banner').style.display = 'none';
     editingProjectId = null;
+    
+    // Reset banner and preview images
+    removeBannerPreview();
+    removeAllPreviews();
     
     // Reset GitHub and Live URL fields
     document.getElementById('has-github').checked = false;
@@ -57,12 +174,26 @@ function showEditForm(project) {
         toggleLiveField();
     }
     
-    // Show current image info
+    // Reset banner and preview images first
+    removeBannerPreview();
+    removeAllPreviews();
+    
+    // Show current banner info
     if (project.imageUrl) {
-        document.getElementById('current-image').style.display = 'block';
-        document.getElementById('current-image-name').textContent = project.imageUrl.split('/').pop();
+        document.getElementById('current-banner').style.display = 'block';
+        document.getElementById('current-banner-name').textContent = project.imageUrl.split('/').pop();
+        
+        // Show current banner as preview
+        const previewImg = document.getElementById('banner-preview');
+        const previewContainer = document.getElementById('banner-preview-container');
+        previewImg.src = project.imageUrl;
+        previewContainer.style.display = 'block';
+        
+        // Change remove button text for existing banner
+        const removeBtn = previewContainer.querySelector('button');
+        removeBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Preview';
     } else {
-        document.getElementById('current-image').style.display = 'none';
+        document.getElementById('current-banner').style.display = 'none';
     }
     
     editingProjectId = project._id;
@@ -99,6 +230,8 @@ function toggleLiveField() {
 function hideAddForm() {
     document.getElementById('add-form').style.display = 'none';
     document.getElementById('project-form').reset();
+    removeBannerPreview();
+    removeAllPreviews();
     editingProjectId = null;
 }
 

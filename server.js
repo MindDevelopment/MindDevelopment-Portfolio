@@ -20,7 +20,8 @@ const projectSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   technologies: [String],
-  imageUrl: String,
+  imageUrl: String, // Banner image
+  previewImages: [String], // Array of preview image URLs
   githubUrl: String,
   liveUrl: String,
   featured: { type: Boolean, default: false },
@@ -57,6 +58,7 @@ const storage = multer.diskStorage({
   }
 });
 
+// Update multer configuration voor multiple files
 const upload = multer({ storage: storage });
 
 // Routes
@@ -113,23 +115,37 @@ app.post('/admin/logout', (req, res) => {
   res.json({ success: true });
 });
 
-app.post('/admin/projects', upload.single('image'), async (req, res) => {
+app.post('/admin/projects', upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'previewImages', maxCount: 10 }
+]), async (req, res) => {
   if (!req.session.admin) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   
   try {
     const { title, description, technologies, githubUrl, liveUrl, featured } = req.body;
-    const project = new Project({
+    
+    const projectData = {
       title,
       description,
       technologies: technologies.split(',').map(tech => tech.trim()),
-      imageUrl: req.file ? `/uploads/${req.file.filename}` : null,
-      githubUrl,
-      liveUrl,
+      githubUrl: githubUrl || null,
+      liveUrl: liveUrl || null,
       featured: featured === 'on'
-    });
+    };
     
+    // Handle banner image
+    if (req.files && req.files.image && req.files.image[0]) {
+      projectData.imageUrl = `/uploads/${req.files.image[0].filename}`;
+    }
+    
+    // Handle preview images
+    if (req.files && req.files.previewImages) {
+      projectData.previewImages = req.files.previewImages.map(file => `/uploads/${file.filename}`);
+    }
+    
+    const project = new Project(projectData);
     await project.save();
     res.json({ success: true, project });
   } catch (error) {
@@ -137,7 +153,10 @@ app.post('/admin/projects', upload.single('image'), async (req, res) => {
   }
 });
 
-app.put('/admin/projects/:id', upload.single('image'), async (req, res) => {
+app.put('/admin/projects/:id', upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'previewImages', maxCount: 10 }
+]), async (req, res) => {
   if (!req.session.admin) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -155,8 +174,13 @@ app.put('/admin/projects/:id', upload.single('image'), async (req, res) => {
     };
     
     // Only update image if new one is uploaded
-    if (req.file) {
-      updateData.imageUrl = `/uploads/${req.file.filename}`;
+    if (req.files && req.files.image && req.files.image[0]) {
+      updateData.imageUrl = `/uploads/${req.files.image[0].filename}`;
+    }
+    
+    // Handle preview images
+    if (req.files && req.files.previewImages) {
+      updateData.previewImages = req.files.previewImages.map(file => `/uploads/${file.filename}`);
     }
     
     const project = await Project.findByIdAndUpdate(req.params.id, updateData, { new: true });
@@ -206,3 +230,4 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   createDefaultAdmin();
 });
+

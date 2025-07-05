@@ -343,6 +343,50 @@ body {
     transform: scale(1.2);
 }
 
+.form-group input[type="file"] {
+    padding: 12px 16px;
+    border: 2px dashed #64748b;
+    border-radius: 8px;
+    background: #334155;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="file"]:hover {
+    border-color: #3b82f6;
+    background: #475569;
+}
+
+#banner-preview-container,
+#preview-images-container {
+    text-align: center;
+    padding: 15px;
+    background: #475569;
+    border-radius: 8px;
+    border: 1px solid #64748b;
+}
+
+#banner-preview {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+#banner-preview:hover {
+    transform: scale(1.05);
+}
+
+.preview-grid {
+    margin-bottom: 15px;
+}
+
+.preview-grid > div {
+    transition: transform 0.3s ease;
+}
+
+.preview-grid > div:hover {
+    transform: scale(1.05);
+}
+
 .form-buttons {
     display: flex;
     gap: 1.5rem;
